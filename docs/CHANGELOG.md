@@ -3,41 +3,10 @@
 User-visible changes to the Prepublish CLI, newest first. The heading version
 matches the `vX.Y.Z` tag the release is built from.
 
-## Unreleased
+## 0.1.0 — 2026-09-29
 
-### New
-
-- **A one-line installer.** `curl -fsSL https://prepublish.ai/install.sh | sh`
-  installs the binary for macOS or Linux on amd64 or arm64. It verifies the
-  archive against the release's `checksums.txt` before unpacking anything, needs
-  no sudo, and prints the one line to add when the install directory is not on
-  `PATH`. `PREPUBLISH_VERSION` pins a tag, `PREPUBLISH_INSTALL_DIR` moves the
-  destination, and an unsupported platform is told so and pointed at the release
-  page or `go install` instead of being handed a binary that cannot run. Windows
-  keeps the zip from the release page.
-- **Releases are built by GoReleaser** from a tagged commit: the six archives —
-  each containing the binary, the license and this README — a `checksums.txt`
-  covering all of them, and `install.sh` attached to the release itself. Asset
-  names carry no version, which is what keeps
-  `.../releases/latest/download/<name>` and the `/install.sh` redirect working.
-  `make release` builds the same set locally as a snapshot, so there is one
-  packaging path rather than two.
-- **The CLI is MIT licensed**, with `LICENSE` included in every archive, plus
-  `SECURITY.md` and `CONTRIBUTING.md` for people arriving from GitHub and
-  `docs/RELEASING.md` for the release steps.
-
-### Fixed
-
-- **The Windows archives build.** The config directory ownership check reached
-  for a Unix-only `syscall.Stat_t`, so the Windows targets did not compile at
-  all. The check is now implemented per platform, and is still skipped where the
-  platform does not report an owner — there the 0700 directory and 0600 files
-  are the whole defence, as before. Behaviour on macOS and Linux is unchanged.
-
-## 0.1.0 (2026-09-29)
-
-The first release. `prepublish` audits a YouTube script before it is recorded,
-and does it either anonymously or as a signed-in account.
+The first public release. `prepublish` audits a YouTube script before it is
+recorded, and does it either anonymously or as a signed-in account.
 
 ### New
 
@@ -102,6 +71,30 @@ and does it either anonymously or as a signed-in account.
 - **`--api-url`, `--no-input` and `--json`** as global flags, plus
   `$PREPUBLISH_API_URL`, `$PREPUBLISH_APP_URL`, `$PREPUBLISH_API_KEY` and
   `$PREPUBLISH_CONFIG_DIR`.
+- **A one-line installer.** `curl -fsSL https://prepublish.ai/install.sh | sh`
+  installs the binary for macOS or Linux on amd64 or arm64. It verifies the
+  archive against the release's `checksums.txt` before unpacking anything, needs
+  no sudo, and prints the one line to add when the install directory is not on
+  `PATH`. `PREPUBLISH_VERSION` pins a tag, `PREPUBLISH_INSTALL_DIR` moves the
+  destination, and an unsupported platform is told so and pointed at the release
+  page or `go install` instead of being handed a binary that cannot run. Windows
+  keeps the zip from the release page.
+- **Releases are built by GoReleaser** from a tagged commit: six archives, each
+  with the binary, the license and the README; a `checksums.txt` covering all of
+  them; and `install.sh` attached to the release. Asset names carry no version,
+  which is what keeps `.../releases/latest/download/<name>` and the `/install.sh`
+  redirect working. `make release` builds the same set locally as a snapshot, so
+  there is one packaging path rather than two.
+- **The CLI is MIT licensed**, with `LICENSE` in every archive and
+  `SECURITY.md`, `CONTRIBUTING.md` and `docs/RELEASING.md` in the repository.
+
+### Fixed
+
+- **The Windows archives build.** The config directory ownership check reached
+  for a Unix-only `syscall.Stat_t`, so the Windows targets did not compile at
+  all. The check is now implemented per platform, and is still skipped where the
+  platform does not report an owner — there the 0700 directory and 0600 files
+  are the whole defence, as before. Behaviour on macOS and Linux is unchanged.
 
 ### Security
 
