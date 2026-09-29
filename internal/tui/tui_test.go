@@ -217,8 +217,8 @@ func itemDesc(m homeModel, want HomeChoice) string {
 func TestHistoryColumnsAlignWithTheirHeader(t *testing.T) {
 	page := &api.AnalysisPage{
 		Analyses: []*api.Analysis{
-			{ID: "a1", VideoTitle: "First draft", Status: api.StatusCompleted, OverallScore: 81, CreatedAt: time.Date(2026, 9, 29, 8, 12, 0, 0, time.UTC)},
-			{ID: "a2", VideoTitle: "Second draft", Status: api.StatusFailed, CreatedAt: time.Date(2026, 9, 28, 8, 12, 0, 0, time.UTC)},
+			{ID: "a1", VideoTitle: "First draft", Status: api.StatusCompleted, OverallScore: 81, CreatedAt: time.Date(2026, 9, 29, 11, 12, 0, 0, time.Local)},
+			{ID: "a2", VideoTitle: "Second draft", Status: api.StatusFailed, CreatedAt: time.Date(2026, 9, 28, 11, 12, 0, 0, time.Local)},
 		},
 		Total: 2, Page: 1, PerPage: 10, TotalPages: 1,
 	}
