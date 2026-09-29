@@ -1,0 +1,15 @@
+# The repository root ignores `*.md`, because that rule targets service
+# documentation that lives with the services. Everything under this directory is
+# published: the CLI module, its installer and release config, and the handful of
+# markdown files a visitor to the public repository reads first. They are
+# re-included explicitly so a change here cannot be silently left out of the
+# subtree split.
+!/docs/
+!/docs/*
+!/README.md
+!/SECURITY.md
+!/CONTRIBUTING.md
+
+# Build output: `make build` and `make release` (a GoReleaser snapshot).
+/bin/
+/dist/

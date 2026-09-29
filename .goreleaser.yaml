@@ -1,0 +1,106 @@
+# Release packaging for the Prepublish CLI.
+#
+# One build matrix produces every asset in the distribution contract, so the
+# archives, the checksums and the installer can never disagree about names.
+#
+#   make release   → goreleaser release --snapshot --clean   (dist/, no upload)
+#   tagged release → .github/workflows/release.yml           (uploads the assets)
+#
+# Asset names are version-less on purpose:
+# https://github.com/prepublish/prepublish-cli/releases/latest/download/<name>
+# has to keep working, which is also the URL the website's /install.sh redirect
+# resolves to.
+version: 2
+
+project_name: prepublish
+
+builds:
+  - id: prepublish
+    main: ./cmd/prepublish
+    binary: prepublish
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    flags:
+      - -trimpath
+    # The same three stamps the Makefile writes, so `prepublish version`, the
+    # User-Agent and a bug report name the same build whichever path produced it.
+    ldflags:
+      - -s -w
+      - -X github.com/prepublish/prepublish-cli/internal/version.Version={{ .Version }}
+      - -X github.com/prepublish/prepublish-cli/internal/version.Commit={{ .ShortCommit }}
+      - -X github.com/prepublish/prepublish-cli/internal/version.Date={{ .Date }}
+    mod_timestamp: "{{ .CommitTimestamp }}"
+
+archives:
+  - id: prepublish
+    ids:
+      - prepublish
+    formats:
+      - tar.gz
+    name_template: "prepublish_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+    files:
+      - LICENSE
+      - README.md
+
+checksum:
+  name_template: checksums.txt
+  algorithm: sha256
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-snapshot"
+
+changelog:
+  use: git
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^tests:"
+      - "^ci:"
+      - "^style:"
+      - "^chore"
+      - "^build:"
+      - "Merge pull request"
+      - "Merge branch"
+  groups:
+    - title: Features
+      regexp: "^.*?feat(\\(.+\\))?!?:.+$"
+      order: 0
+    - title: Bug fixes
+      regexp: "^.*?fix(\\(.+\\))?!?:.+$"
+      order: 1
+    - title: Other changes
+      order: 999
+
+release:
+  github:
+    owner: prepublish
+    name: prepublish-cli
+  draft: false
+  prerelease: auto
+  header: |
+    Install with:
+
+    ```sh
+    curl -fsSL https://prepublish.ai/install.sh | sh
+    ```
+
+    Or download the archive for your platform and verify it against
+    `checksums.txt`. The installer and every archive on this page are built
+    from the tag this release points at.
+  # The website's /install.sh redirect points here, so each release carries the
+  # installer that matches it instead of serving one from a moving branch.
+  extra_files:
+    - glob: install.sh

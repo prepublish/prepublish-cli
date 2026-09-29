@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          # From go.mod, never repeated here: a version written twice drifts,
+          # and a toolchain older than the module refuses to build it.
+          go-version-file: go.mod
+
+      - name: Check formatting
+        run: |
+          unformatted="$(gofmt -l .)"
+          if [ -n "$unformatted" ]; then
+            echo "gofmt would change these files:"
+            echo "$unformatted"
+            exit 1
+          fi
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test
+        run: go test -race ./...
+
+  shellcheck:
+    name: ShellCheck the installer
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # The one file users run before they have the CLI, and the one file that
+      # cannot be fixed by a new release: `curl | sh` has to work first time,
+      # under whatever /bin/sh the machine has.
+      - name: shellcheck install.sh
+        run: docker run --rm -v "$PWD:/mnt" koalaman/shellcheck:v0.11.0 /mnt/install.sh
